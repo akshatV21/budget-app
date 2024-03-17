@@ -13,8 +13,11 @@ model User {
   username String
   password String
 
-  avatar String
+  avatar String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([username])
+  @@index([username])
 }
