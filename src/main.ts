@@ -1,17 +1,8 @@
-import { NestFactory } from '@nestjs/core'
-import { AppModule } from './app.module'
-import { ConfigService } from '@nestjs/config'
-import { ValidationPipe } from '@nestjs/common'
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
-  const config = app.get<ConfigService>(ConfigService)
-
-  const PORT = config.getOrThrow('PORT')
-
-  app.setGlobalPrefix('api')
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
-
-  await app.listen(PORT, () => console.log(`Listening to requests on port: ${PORT}`))
+  const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
 }
-bootstrap()
+bootstrap();
