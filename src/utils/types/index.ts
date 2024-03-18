@@ -3,3 +3,12 @@ export type HttpResponse = Promise<{
   message: string
   data?: Record<string, any>
 }>
+
+export type AuthOptions = {
+  isOpen?: boolean
+  isLive?: boolean
+}
+
+export type AuthUser = {
+  id: string
+}
