@@ -39,13 +39,13 @@ export class Authorize implements CanActivate {
     }
 
     const data = this.validateToken(token, this.configService.getOrThrow('JWT_SECRET'))
-    const user = await this.db.user.findUnique({ where: { id: data.id }, select: {} })
+    const user = await this.db.user.findUnique({ where: { id: data.id }, select: { id: true, username: true } })
 
     if (!user) {
       throw new UnauthorizedException('Invalid token provided.')
     }
 
-    request.user = data
+    request.user = user
     return true
   }
 
