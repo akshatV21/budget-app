@@ -3,6 +3,8 @@ import { DatabaseService } from 'src/database/database.service'
 import { CreateProfileDto } from './dtos/create-profile.dto'
 import { Prisma } from '@prisma/client'
 import { PaginationDto } from 'src/utils/dtos'
+import { AuthUser } from 'src/utils/types'
+import { UpdateProfileDto } from './dtos/update-profile.dto'
 
 @Injectable()
 export class ProfilesService {
@@ -39,5 +41,48 @@ export class ProfilesService {
     })
 
     return profiles
+  }
+
+  async update(data: UpdateProfileDto, user: AuthUser) {
+    const profile = await this.db.profile.findUnique({
+      where: { id: data.profileId },
+      select: { id: true, ownerId: true },
+    })
+
+    if (!profile) {
+      throw new BadRequestException('No profile found with provided id.')
+    }
+
+    if (profile.ownerId !== user.id) {
+      throw new BadRequestException('You are not authorized to update this profile.')
+    }
+
+    const updateData: Prisma.ProfileUpdateInput = {}
+
+    if (data.name) updateData.name = data.name
+    if (data.email) updateData.email = data.email
+    if (data.phone) updateData.phone = data.phone
+
+    await this.db.profile.update({
+      where: { id: data.profileId },
+      data: updateData,
+    })
+  }
+
+  async delete(profileId: string, user: AuthUser) {
+    const profile = await this.db.profile.findUnique({
+      where: { id: profileId },
+      select: { id: true, ownerId: true },
+    })
+
+    if (!profile) {
+      throw new BadRequestException('No profile found with provided id.')
+    }
+
+    if (profile.ownerId !== user.id) {
+      throw new BadRequestException('You are not authorized to delete this profile.')
+    }
+
+    await this.db.profile.delete({ where: { id: profileId } })
   }
 }
