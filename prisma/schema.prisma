@@ -35,7 +35,7 @@ model User {
 model Profile {
   id String @id @default(cuid())
 
-  name   String
+  name   String  @unique
   avatar String?
 
   email String?
@@ -47,17 +47,16 @@ model Profile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([name])
-  @@index([ownerId, name])
+  @@index([ownerId])
 }
 
 model Account {
   id String @id @default(cuid())
 
-  name String
+  name String @unique
 
   bank      String
-  accountNo String
+  accountNo String @unique
   ifscCode  String
 
   balance Float @default(0)
@@ -69,6 +68,10 @@ model Account {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([accountNo])
+  @@index([ownerId])
 }
 
 model Card {
@@ -76,7 +79,7 @@ model Card {
 
   name String
 
-  cardNo String
+  cardNo String @unique
   expiry String
   cvv    String
 
@@ -90,4 +93,7 @@ model Card {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([bankId])
+  @@index([ownerId])
 }
