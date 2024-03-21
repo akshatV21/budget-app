@@ -49,6 +49,7 @@ export class AccountsService {
       where,
       take: limit,
       skip: (page - 1) * limit,
+      select: { id: true, name: true, bank: true, balance: true },
     })
 
     return accounts

@@ -38,6 +38,7 @@ export class ProfilesService {
       where,
       take: limit,
       skip: (page - 1) * limit,
+      select: { id: true, name: true, avatar: true },
     })
 
     return profiles
