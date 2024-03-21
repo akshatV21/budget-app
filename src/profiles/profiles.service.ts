@@ -32,7 +32,7 @@ export class ProfilesService {
     const limit = pagination.limit ?? 20
 
     const where: Prisma.ProfileWhereInput = { ownerId: userId }
-    if (pagination.search) where.name = { contains: pagination.search }
+    if (pagination.search) where.name = { contains: pagination.search, mode: 'insensitive' }
 
     const profiles = await this.db.profile.findMany({
       where,
