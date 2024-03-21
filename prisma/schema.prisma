@@ -85,8 +85,8 @@ model Card {
 
   type CardType
 
-  bankId String
-  bank   Account @relation(fields: [bankId], references: [id])
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id])
 
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
@@ -94,6 +94,6 @@ model Card {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([bankId])
+  @@index([accountId])
   @@index([ownerId])
 }
