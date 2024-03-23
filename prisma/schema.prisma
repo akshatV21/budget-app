@@ -81,7 +81,7 @@ model Card {
 
   name String
 
-  number String
+  number String @unique
   expiry String
   cvv    String
 
@@ -96,7 +96,7 @@ model Card {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([name, number, ownerId])
+  @@unique([name, ownerId])
   @@index([number])
   @@index([accountId])
   @@index([ownerId])
