@@ -12,7 +12,7 @@ export class ProfilesService {
 
   async create(createProfileDto: CreateProfileDto, userId: string) {
     const duplicate = await this.db.profile.findUnique({
-      where: { name: createProfileDto.name },
+      where: { name_ownerId: { name: createProfileDto.name, ownerId: userId } },
       select: { id: true },
     })
 
