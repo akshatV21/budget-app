@@ -12,6 +12,12 @@ enum CardType {
   credit
 }
 
+enum Interval {
+  weekly
+  monthly
+  yearly
+}
+
 model User {
   id String @id @default(cuid())
 
@@ -24,6 +30,8 @@ model User {
 
   accounts Account[]
   cards    Card[]
+
+  interval Interval @default(monthly)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

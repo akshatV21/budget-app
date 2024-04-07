@@ -1,3 +1,5 @@
+import { Interval } from '@prisma/client'
+
 export type HttpResponse = Promise<{
   success: boolean
   message: string
@@ -11,4 +13,6 @@ export type AuthOptions = {
 
 export type AuthUser = {
   id: string
+  username: string
+  internal: Interval
 }
