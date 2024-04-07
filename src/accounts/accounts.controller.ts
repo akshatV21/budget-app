@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common'
 import { AccountsService } from './accounts.service'
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import { AuthUser, HttpResponse } from 'src/utils/types'
@@ -23,6 +23,13 @@ export class AccountsController {
   async httpListAccounts(@Query() pagination: PaginationDto, @User() user: AuthUser): HttpResponse {
     const accounts = await this.accountsService.list(pagination, user)
     return { success: true, message: 'Fetched accounts successfully.', data: { accounts } }
+  }
+
+  @Get(':accountId')
+  @Auth()
+  async httpGetAccountById(@Param('accountId') accountId: string, @User() user: AuthUser) {
+    const account = await this.accountsService.getById(accountId, user)
+    return { success: true, message: 'Fetched account successfully.', data: { account } }
   }
 
   @Put('update')

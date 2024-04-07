@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/database/database.service'
 import { CreateAccountDto } from './dtos/create-account.dto'
 import { AuthUser } from 'src/utils/types'
@@ -34,6 +34,31 @@ export class AccountsService {
     const account = await this.db.account.create({
       data: { ...data, ownerId: user.id },
     })
+
+    return account
+  }
+
+  async getById(accountId: string, user: AuthUser) {
+    const account = await this.db.account.findUnique({
+      where: { id: accountId },
+      select: {
+        id: true,
+        name: true,
+        bank: true,
+        accountNo: true,
+        ifscCode: true,
+        balance: true,
+        ownerId: true,
+      },
+    })
+
+    if (!account) {
+      throw new BadRequestException('No account found with provided id.')
+    }
+
+    if (account.ownerId !== user.id) {
+      throw new ForbiddenException('You are not authorized to view this account.')
+    }
 
     return account
   }
