@@ -12,12 +12,12 @@ export class AccountsService {
 
   async create(data: CreateAccountDto, user: AuthUser) {
     const duplicateNamePromise = this.db.account.findUnique({
-      where: { name: data.name, ownerId: user.id },
+      where: { ownerId_name: { ownerId: user.id, name: data.name } },
       select: { id: true },
     })
 
     const duplicateAccNoPromise = this.db.account.findUnique({
-      where: { accountNo: data.accountNo },
+      where: { ownerId_accountNo: { ownerId: user.id, accountNo: data.accountNo } },
       select: { id: true },
     })
 
