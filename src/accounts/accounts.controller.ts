@@ -27,7 +27,7 @@ export class AccountsController {
 
   @Get(':accountId')
   @Auth()
-  async httpGetAccountById(@Param('accountId') accountId: string, @User() user: AuthUser) {
+  async httpGetAccountById(@Param('accountId') accountId: string, @User() user: AuthUser): HttpResponse {
     const account = await this.accountsService.getById(accountId, user)
     return { success: true, message: 'Fetched account successfully.', data: { account } }
   }
