@@ -18,6 +18,27 @@ enum Interval {
   yearly
 }
 
+enum TransactionType {
+  debit
+  credit
+}
+
+enum TransactionCategory {
+  food
+  shopping
+  travel
+  health
+  entertainment
+  loan
+  repayment
+  others
+}
+
+enum LoanStatus {
+  pending
+  cleared
+}
+
 model User {
   id String @id @default(cuid())
 
@@ -32,6 +53,8 @@ model User {
   cards    Card[]
 
   interval Interval @default(monthly)
+
+  transactions Transaction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,6 +74,8 @@ model Profile {
 
   ownerId String
   owner   User   @relation(fields: [ownerId], references: [id])
+
+  transactions Transaction[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -109,4 +134,37 @@ model Card {
   @@index([number])
   @@index([accountId])
   @@index([ownerId])
+}
+
+model Loan {
+  id String @id @default(cuid())
+
+  remaining Float
+  status    LoanStatus @default(pending)
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id String @id @default(cuid())
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id])
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  amount Float
+
+  type     TransactionType
+  category TransactionCategory
+
+  loanId String?
+  loan   Loan?   @relation(fields: [loanId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([profileId])
 }
