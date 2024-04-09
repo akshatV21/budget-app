@@ -4,6 +4,7 @@ import { CreateCardDto } from './dtos/create-card.dto'
 import { AuthUser } from 'src/utils/types'
 import { ListCardsDto } from './dtos/list-cards.dto'
 import { Prisma } from '@prisma/client'
+import { UpdateCardDto } from './dtos/update-card.dto'
 
 @Injectable()
 export class CardsService {
@@ -58,5 +59,29 @@ export class CardsService {
     })
 
     return cards
+  }
+
+  async update(data: UpdateCardDto, user: AuthUser) {
+    const card = await this.db.card.findUnique({
+      where: { id: data.cardId, ownerId: user.id },
+      select: { id: true },
+    })
+
+    if (!card) {
+      throw new BadRequestException('No card found with provided id.')
+    }
+
+    const updateData: Prisma.CardUpdateInput = {}
+
+    if (data.name) updateData.name = data.name
+    if (data.number) updateData.number = data.number
+    if (data.expiry) updateData.expiry = data.expiry
+    if (data.cvv) updateData.cvv = data.cvv
+    if (data.type) updateData.type = data.type
+
+    await this.db.card.update({
+      where: { id: data.cardId },
+      data: updateData,
+    })
   }
 }
