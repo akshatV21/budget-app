@@ -43,9 +43,19 @@ export class TransactionsService {
         await this.handleRepayment(data.loanId, data.amount, tdb)
       }
 
-      transaction = await this.db.transaction.create({
+      let operation = data.type === 'credit' ? 'increment' : 'decrement'
+
+      const createTransactionPromise = tdb.transaction.create({
         data: { ...data, ownerId: user.id, loanId },
       })
+
+      const updateAccountPromise = tdb.account.update({
+        where: { id: data.accountId },
+        data: { balance: { [operation]: data.amount } },
+      })
+
+      const resolved = await Promise.all([createTransactionPromise, updateAccountPromise])
+      transaction = resolved[0]
     })
 
     return transaction
@@ -62,7 +72,7 @@ export class TransactionsService {
   private async handleRepayment(loanId: string, amount: number, tdb: Prisma.TransactionClient) {
     const loan = await tdb.loan.findUnique({
       where: { id: loanId },
-      select: { remaining: true },
+      select: { remaining: true, status: true },
     })
 
     if (!loan) {
@@ -73,9 +83,14 @@ export class TransactionsService {
       throw new BadRequestException('Amount exceeds remaining loan balance.')
     }
 
+    const allIsPaid = loan.remaining === amount
+
     return tdb.loan.update({
       where: { id: loanId },
-      data: { remaining: { decrement: amount } },
+      data: {
+        remaining: { decrement: amount },
+        status: allIsPaid ? 'cleared' : 'pending',
+      },
     })
   }
 }
