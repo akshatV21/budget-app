@@ -61,6 +61,29 @@ export class TransactionsService {
     return transaction
   }
 
+  async getById(transactionId: string, user: AuthUser) {
+    const transaction = await this.db.transaction.findUnique({
+      where: { id: transactionId, ownerId: user.id },
+      select: {
+        id: true,
+        amount: true,
+        type: true,
+        category: true,
+        account: { select: { id: true, name: true } },
+        loan: true,
+        profile: { select: { id: true, name: true, avatar: true } },
+        createdAt: true,
+        updatedAt: true,
+      },
+    })
+
+    if (!transaction) {
+      throw new BadRequestException('No transaction found with provided id.')
+    }
+
+    return transaction
+  }
+
   private async upsertLoan(amount: number, profileId: string, ownerId: string, tdb: Prisma.TransactionClient) {
     return tdb.loan.upsert({
       where: { ownerId_profileId: { ownerId, profileId } },
