@@ -8,12 +8,11 @@ COPY /package*.json .
 COPY /pnpm-lock.yaml .
 RUN pnpm install
 
+RUN pnpm add prisma -g
+RUN chmod +x ./docker/entrypoint.sh
+
 COPY . .
 RUN pnpm run build
-
-RUN pnpm add prisma -g
-
-RUN chmod +x ./docker/entrypoint.sh
 
 ENTRYPOINT ["./docker/entrypoint.sh"]
 CMD ["node", "dist/main"]
