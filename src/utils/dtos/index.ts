@@ -1,5 +1,6 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator'
 import { Transform } from 'class-transformer'
+import { Order } from '../types'
 
 export class PaginationDto {
   @IsOptional()
@@ -15,4 +16,8 @@ export class PaginationDto {
   @IsOptional()
   @IsString()
   search?: string
+
+  @IsOptional()
+  @IsString()
+  order?: Order
 }

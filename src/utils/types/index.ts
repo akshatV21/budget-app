@@ -14,5 +14,7 @@ export type AuthOptions = {
 export type AuthUser = {
   id: string
   username: string
-  internal: Interval
+  interval: Interval
 }
+
+export type Order = 'asc' | 'desc'

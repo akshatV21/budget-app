@@ -3,6 +3,7 @@ import { DatabaseService } from 'src/database/database.service'
 import { CreateTransactionDto } from './dtos/create-transaction.dto'
 import { AuthUser } from 'src/utils/types'
 import { Prisma } from '@prisma/client'
+import { ListTransactionsDto } from './dtos/list-transaction.dto'
 
 @Injectable()
 export class TransactionsService {
@@ -82,6 +83,35 @@ export class TransactionsService {
     }
 
     return transaction
+  }
+
+  async list(query: ListTransactionsDto, user: AuthUser) {
+    const page = query.page ?? 1
+    const limit = query.limit ?? 10
+
+    const where: Prisma.TransactionWhereInput = { ownerId: user.id }
+
+    if (query.loanId) where.loanId = query.loanId
+    if (query.profileId) where.profileId = query.profileId
+    if (query.accountId) where.accountId = query.accountId
+
+    const transactions = await this.db.transaction.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      select: {
+        id: true,
+        amount: true,
+        type: true,
+        category: true,
+        loanId: true,
+        account: { select: { id: true, name: true } },
+        profile: { select: { id: true, name: true, avatar: true } },
+      },
+      orderBy: { createdAt: query.order ?? 'desc' },
+    })
+
+    return transactions
   }
 
   private async upsertLoan(amount: number, profileId: string, ownerId: string, tdb: Prisma.TransactionClient) {
