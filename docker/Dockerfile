@@ -12,7 +12,7 @@ COPY /pnpm-lock.yaml .
 RUN pnpm install
 
 COPY . .
-RUN pnpm build
+RUN pnpm run build
 
 RUN pnpm add prisma -g
 
