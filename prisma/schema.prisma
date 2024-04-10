@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CardType {
+  debit
+  credit
+}
+
+enum Interval {
+  weekly
+  monthly
+  yearly
+}
+
+enum TransactionType {
+  debit
+  credit
+}
+
+enum TransactionCategory {
+  food
+  shopping
+  travel
+  health
+  entertainment
+  loan
+  repayment
+  others
+}
+
+enum LoanStatus {
+  pending
+  cleared
+}
+
+model User {
+  id String @id @default(cuid())
+
+  username String
+  password String
+
+  avatar String?
+
+  profiles Profile[]
+
+  accounts Account[]
+  cards    Card[]
+
+  interval Interval @default(monthly)
+
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([username])
+  @@index([username])
+}
+
+model Profile {
+  id String @id @default(cuid())
+
+  name   String
+  avatar String?
+
+  email String?
+  phone String?
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, ownerId])
+  @@index([ownerId])
+}
+
+model Account {
+  id String @id @default(cuid())
+
+  name String
+
+  bank      String
+  accountNo String
+  ifscCode  String
+
+  balance Float @default(0)
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  cards        Card[]
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ownerId, name])
+  @@unique([ownerId, accountNo])
+  @@index([name])
+  @@index([accountNo])
+  @@index([ownerId])
+}
+
+model Card {
+  id String @id @default(cuid())
+
+  name String
+
+  number String @unique
+  expiry String
+  cvv    String
+
+  type CardType
+
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id])
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, ownerId])
+  @@index([number])
+  @@index([accountId])
+  @@index([ownerId])
+}
+
+model Loan {
+  id String @id @default(cuid())
+
+  remaining Float
+  status    LoanStatus @default(pending)
+
+  ownerId   String
+  profileId String
+
+  transactions Transaction[]
+
+  @@unique([ownerId, profileId])
+  @@index([ownerId, profileId])
+}
+
+model Transaction {
+  id String @id @default(cuid())
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id])
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  amount Float
+
+  type     TransactionType
+  category TransactionCategory
+
+  loanId String?
+  loan   Loan?   @relation(fields: [loanId], references: [id])
+
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([profileId])
+}
