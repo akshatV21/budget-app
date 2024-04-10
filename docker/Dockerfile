@@ -2,24 +2,21 @@ FROM node:19-alpine as development
 
 WORKDIR /app
 
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
 RUN npm install -g pnpm
 
 COPY /package*.json .
+COPY /pnpm-lock.yaml .
 RUN pnpm install
 
 COPY . .
 RUN pnpm build
 
-FROM node:19-alpine As production
+RUN pnpm add prisma -g
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+RUN chmod +x ./docker/entrypoint.sh
 
-WORKDIR /app
-
-COPY /package*.json .
-RUN pnpm install --prod
-
-COPY --from=development /app/dist ./dist
-
-CMD ["node", "dist/apps/spawns/main"]
+ENTRYPOINT ["./docker/entrypoint.sh"]
+CMD ["node", "dist/main"]
