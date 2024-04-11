@@ -15,6 +15,6 @@ RUN pnpm db:generate
 
 RUN pnpm run build
 
-RUN pnpm db:migrate
+RUN pnpm db:migrate:deploy
 
 CMD ["node", "dist/main"]
