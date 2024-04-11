@@ -6,13 +6,15 @@ RUN npm install -g pnpm
 
 COPY /package*.json .
 COPY /pnpm-lock.yaml .
+
 RUN pnpm install
 
 COPY . .
 
-RUN chmod +x ./entrypoint.sh
+RUN pnpm db:generate
 
 RUN pnpm run build
 
-ENTRYPOINT ["./entrypoint.sh"]
+RUN pnpm db:migrate
+
 CMD ["node", "dist/main"]
