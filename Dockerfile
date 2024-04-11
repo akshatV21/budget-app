@@ -15,6 +15,7 @@ RUN pnpm db:generate
 
 RUN pnpm run build
 
-RUN pnpm db:migrate:deploy
+RUN chmod +x ./entrypoint.sh
 
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["node", "dist/main"]
