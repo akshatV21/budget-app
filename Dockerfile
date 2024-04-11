@@ -8,6 +8,8 @@ COPY /package*.json .
 COPY /pnpm-lock.yaml .
 RUN pnpm install
 
+RUN ls
+
 RUN chmod +x ./entrypoint.sh
 
 COPY . .
