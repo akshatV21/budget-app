@@ -1,6 +1,6 @@
 #!/bin/sh
 
 pnpm run db:generate
-pnpm run db:deploy
+pnpm run db:migrate:deploy
 
 exec "$@"
