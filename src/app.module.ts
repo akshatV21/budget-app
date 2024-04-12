@@ -6,9 +6,10 @@ import { ProfilesModule } from './profiles/profiles.module';
 import { AccountsModule } from './accounts/accounts.module';
 import { CardsModule } from './cards/cards.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, AuthModule, ProfilesModule, AccountsModule, CardsModule, TransactionsModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, AuthModule, ProfilesModule, AccountsModule, CardsModule, TransactionsModule, StatsModule],
   controllers: [],
   providers: [],
 })

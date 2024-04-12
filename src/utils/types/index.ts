@@ -1,4 +1,4 @@
-import { Interval } from '@prisma/client'
+import { Interval, TransactionType } from '@prisma/client'
 
 export type HttpResponse = Promise<{
   success: boolean
@@ -18,3 +18,19 @@ export type AuthUser = {
 }
 
 export type Order = 'asc' | 'desc'
+
+export type Operation = 'debited' | 'credited'
+
+export type TransactionCreatedDto = {
+  transactionId: string
+  type: TransactionType
+  amount: number
+  accountId: string
+  profileId: string
+}
+
+export type IntervalDates = {
+  weekly: { from: string | Date; to: string | Date }
+  monthly: { from: string | Date; to: string | Date }
+  yearly: { from: string | Date; to: string | Date }
+}

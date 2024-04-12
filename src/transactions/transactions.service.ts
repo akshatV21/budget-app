@@ -114,7 +114,12 @@ export class TransactionsService {
     return transactions
   }
 
-  private async upsertLoan(amount: number, profileId: string, ownerId: string, tdb: Prisma.TransactionClient) {
+  private async upsertLoan(
+    amount: number,
+    profileId: string,
+    ownerId: string,
+    tdb: Prisma.TransactionClient,
+  ) {
     return tdb.loan.upsert({
       where: { ownerId_profileId: { ownerId, profileId } },
       create: { remaining: amount, profileId, ownerId, status: 'pending' },
