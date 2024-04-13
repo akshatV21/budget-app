@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common'
+import { OnEvent } from '@nestjs/event-emitter'
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'
 import { DatabaseService } from 'src/database/database.service'
+import { EVENTS } from 'src/utils/constants'
 import { IntervalDates, Operation, TransactionCreatedDto } from 'src/utils/types'
 
 @Injectable()
 export class StatsService {
   constructor(private readonly db: DatabaseService) {}
 
+  @OnEvent(EVENTS.TRANSACTION_CREATED)
   private async handleTransactionCreatedEvent(data: TransactionCreatedDto) {
     const currentDate = new Date()
 
@@ -16,11 +19,13 @@ export class StatsService {
     console.log(`
     id: ${data.transactionId}
     event: 'transaction-created'
-    message: 'Handling transaction created event'
+    message: 'Started handling transaction created event'
     `)
 
     try {
+      console.time(`TIME [${data.transactionId}]`)
       await this.handleAccountStats(data, dates, operation)
+      console.timeEnd(`TIME [${data.transactionId}]`)
     } catch (error) {
       console.log(`
         id: ${data.transactionId}
@@ -33,7 +38,7 @@ export class StatsService {
     console.log(`
     id: ${data.transactionId}
     event: 'transaction-created'
-    message: 'Handled transaction created event successfully'
+    message: 'Successfully handled transaction created event.'
     `)
   }
 
