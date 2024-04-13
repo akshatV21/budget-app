@@ -5,6 +5,8 @@ import { AuthUser } from 'src/utils/types'
 import { PaginationDto } from 'src/utils/dtos'
 import { Prisma } from '@prisma/client'
 import { UpdateAccountDto } from './dtos/update-account.dto'
+import { endOfWeek, startOfWeek } from 'date-fns'
+import { generateDatesByInterval } from 'src/utils/functions'
 
 @Injectable()
 export class AccountsService {
@@ -21,7 +23,10 @@ export class AccountsService {
       select: { id: true },
     })
 
-    const [duplicateName, duplicateAccNo] = await Promise.all([duplicateNamePromise, duplicateAccNoPromise])
+    const [duplicateName, duplicateAccNo] = await Promise.all([
+      duplicateNamePromise,
+      duplicateAccNoPromise,
+    ])
 
     if (duplicateName) {
       throw new BadRequestException('Provided account name already exists')
@@ -39,7 +44,10 @@ export class AccountsService {
   }
 
   async getById(accountId: string, user: AuthUser) {
-    const account = await this.db.account.findUnique({
+    const currentDate = new Date()
+    const dates = generateDatesByInterval(currentDate, user.interval)
+
+    const accountPromise = this.db.account.findUnique({
       where: { id: accountId },
       select: {
         id: true,
@@ -52,6 +60,20 @@ export class AccountsService {
       },
     })
 
+    const statsPromise = this.db.accountStats.findUnique({
+      where: {
+        from_to_interval_accountId: {
+          from: dates.from,
+          to: dates.to,
+          interval: user.interval,
+          accountId,
+        },
+      },
+      select: { id: true, from: true, to: true, credited: true, debited: true },
+    })
+
+    const [account, stats] = await Promise.all([accountPromise, statsPromise])
+
     if (!account) {
       throw new BadRequestException('No account found with provided id.')
     }
@@ -60,7 +82,8 @@ export class AccountsService {
       throw new ForbiddenException('You are not authorized to view this account.')
     }
 
-    return account
+    const res = { ...account, stats }
+    return res
   }
 
   async list(pagination: PaginationDto, user: AuthUser) {
