@@ -1,0 +1,43 @@
+# artillery run ./artillery/get-routes.test.yml
+config:
+  # target: http://localhost:8080/api
+  target: https://budget-api-development.up.railway.app/api
+  phases:
+    - duration: 10
+      arrivalRate: 10
+      name: Main Phase
+    # - duration: 20
+    # arrivalRate: 5
+    # rampTo: 10
+    # name: Ramp up load
+    # - duration: 20
+    #   arrivalRate: 10
+    #   rampTo: 30
+    #   name: Spike phase
+  # Load & configure a couple of useful plugins
+  # https://docs.art/reference/extensions
+  plugins:
+    apdex: {}
+    metrics-by-endpoint: {}
+  apdex:
+    threshold: 400
+scenarios:
+  - flow:
+      - loop:
+          - get:
+              url: '/accounts/list'
+              headers:
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwMjQzNzYsImV4cCI6MTcxMzExMDc3Nn0.fkUjb7WbHeEOWrOaN4kyHgjF-0eApx8cKRNdbFIKjsk'
+          - get:
+              url: '/cards/list'
+              headers:
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwMjQzNzYsImV4cCI6MTcxMzExMDc3Nn0.fkUjb7WbHeEOWrOaN4kyHgjF-0eApx8cKRNdbFIKjsk'
+          - get:
+              url: '/profiles/list'
+              headers:
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwMjQzNzYsImV4cCI6MTcxMzExMDc3Nn0.fkUjb7WbHeEOWrOaN4kyHgjF-0eApx8cKRNdbFIKjsk'
+          - get:
+              url: '/transactions/list'
+              headers:
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwMjQzNzYsImV4cCI6MTcxMzExMDc3Nn0.fkUjb7WbHeEOWrOaN4kyHgjF-0eApx8cKRNdbFIKjsk'
+        count: 40
