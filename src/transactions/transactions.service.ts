@@ -1,13 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/database/database.service'
 import { CreateTransactionDto } from './dtos/create-transaction.dto'
-import { AuthUser } from 'src/utils/types'
+import { AuthUser, TransactionCreatedDto } from 'src/utils/types'
 import { Prisma } from '@prisma/client'
 import { ListTransactionsDto } from './dtos/list-transaction.dto'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+import { EVENTS } from 'src/utils/constants'
 
 @Injectable()
 export class TransactionsService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly emitter: EventEmitter2,
+  ) {}
 
   async create(data: CreateTransactionDto, user: AuthUser) {
     const profilePromise = this.db.profile.findUnique({
@@ -59,6 +64,15 @@ export class TransactionsService {
       transaction = resolved[0]
     })
 
+    const payload: TransactionCreatedDto = {
+      transactionId: transaction.id,
+      type: transaction.type,
+      amount: transaction.amount,
+      profileId: transaction.profileId,
+      accountId: transaction.accountId,
+    }
+
+    this.emitter.emitAsync(EVENTS.TRANSACTION_CREATED, payload)
     return transaction
   }
 
@@ -114,7 +128,12 @@ export class TransactionsService {
     return transactions
   }
 
-  private async upsertLoan(amount: number, profileId: string, ownerId: string, tdb: Prisma.TransactionClient) {
+  private async upsertLoan(
+    amount: number,
+    profileId: string,
+    ownerId: string,
+    tdb: Prisma.TransactionClient,
+  ) {
     return tdb.loan.upsert({
       where: { ownerId_profileId: { ownerId, profileId } },
       create: { remaining: amount, profileId, ownerId, status: 'pending' },

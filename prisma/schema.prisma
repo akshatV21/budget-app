@@ -100,6 +100,7 @@ model Account {
 
   cards        Card[]
   transactions Transaction[]
+  stats        AccountStats[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -166,8 +167,29 @@ model Transaction {
   type     TransactionType
   category TransactionCategory
 
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id])
+
   loanId String?
   loan   Loan?   @relation(fields: [loanId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([profileId])
+}
+
+model AccountStats {
+  id String @id @default(cuid())
+
+  from DateTime
+  to   DateTime
+
+  interval Interval
+
+  credited Float @default(0)
+  debited  Float @default(0)
 
   accountId String
   account   Account @relation(fields: [accountId], references: [id])
@@ -175,6 +197,6 @@ model Transaction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([ownerId])
-  @@index([profileId])
+  @@unique([from, to, interval, accountId])
+  @@index([from, to, interval, accountId])
 }
