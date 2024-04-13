@@ -3,6 +3,7 @@ import { OnEvent } from '@nestjs/event-emitter'
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear } from 'date-fns'
 import { DatabaseService } from 'src/database/database.service'
 import { EVENTS } from 'src/utils/constants'
+import { generateIntervalDates } from 'src/utils/functions'
 import { IntervalDates, Operation, TransactionCreatedDto } from 'src/utils/types'
 
 @Injectable()
@@ -13,7 +14,7 @@ export class StatsService {
   private async handleTransactionCreatedEvent(data: TransactionCreatedDto) {
     const currentDate = new Date()
 
-    const dates = this.generateIntervalDates(currentDate)
+    const dates = generateIntervalDates(currentDate)
     const operation = data.type === 'credit' ? 'credited' : 'debited'
 
     console.log(`
@@ -114,22 +115,5 @@ export class StatsService {
     event: 'transaction-created'
     message: 'Handled account stats successfully'
     `)
-  }
-
-  private generateIntervalDates(currentDate: Date): IntervalDates {
-    return {
-      weekly: {
-        from: startOfWeek(currentDate),
-        to: endOfWeek(currentDate),
-      },
-      monthly: {
-        from: startOfMonth(currentDate),
-        to: endOfMonth(currentDate),
-      },
-      yearly: {
-        from: startOfYear(currentDate),
-        to: endOfYear(currentDate),
-      },
-    }
   }
 }
