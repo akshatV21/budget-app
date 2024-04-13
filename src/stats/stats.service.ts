@@ -23,9 +23,7 @@ export class StatsService {
     `)
 
     try {
-      console.time(`TIME [${data.transactionId}]`)
       await this.handleAccountStats(data, dates, operation)
-      console.timeEnd(`TIME [${data.transactionId}]`)
     } catch (error) {
       console.log(`
         id: ${data.transactionId}

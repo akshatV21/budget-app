@@ -128,6 +128,12 @@ export class TransactionsService {
     return transactions
   }
 
+  async clean() {
+    await this.db.loan.deleteMany({})
+    await this.db.transaction.deleteMany({})
+    await this.db.accountStats.deleteMany({})
+  }
+
   private async upsertLoan(
     amount: number,
     profileId: string,
