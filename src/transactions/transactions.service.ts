@@ -1,17 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/database/database.service'
 import { CreateTransactionDto } from './dtos/create-transaction.dto'
 import { AuthUser, TransactionCreatedDto } from 'src/utils/types'
 import { Prisma } from '@prisma/client'
 import { ListTransactionsDto } from './dtos/list-transaction.dto'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { EVENTS } from 'src/utils/constants'
+import { EVENTS, TTL } from 'src/utils/constants'
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
 
 @Injectable()
 export class TransactionsService {
   constructor(
     private readonly db: DatabaseService,
     private readonly emitter: EventEmitter2,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
 
   async create(data: CreateTransactionDto, user: AuthUser) {
@@ -103,6 +105,11 @@ export class TransactionsService {
     const page = query.page ?? 1
     const limit = query.limit ?? 10
 
+    const key = `transactions:${user.id}:${page}:${limit}:${query.loanId ?? ''}:${query.profileId ?? ''}:${query.accountId ?? ''}`
+
+    const cached = await this.cache.get(key)
+    if (cached) return cached
+
     const where: Prisma.TransactionWhereInput = { ownerId: user.id }
 
     if (query.loanId) where.loanId = query.loanId
@@ -125,6 +132,7 @@ export class TransactionsService {
       orderBy: { createdAt: query.order ?? 'desc' },
     })
 
+    await this.cache.set(key, transactions, TTL)
     return transactions
   }
 

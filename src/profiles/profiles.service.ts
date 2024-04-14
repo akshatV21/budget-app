@@ -1,14 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/database/database.service'
 import { CreateProfileDto } from './dtos/create-profile.dto'
 import { Prisma } from '@prisma/client'
 import { PaginationDto } from 'src/utils/dtos'
 import { AuthUser } from 'src/utils/types'
 import { UpdateProfileDto } from './dtos/update-profile.dto'
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
+import { TTL } from 'src/utils/constants'
 
 @Injectable()
 export class ProfilesService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
+  ) {}
 
   async create(createProfileDto: CreateProfileDto, userId: string) {
     const duplicate = await this.db.profile.findUnique({
@@ -31,6 +36,11 @@ export class ProfilesService {
     const page = pagination.page ?? 1
     const limit = pagination.limit ?? 20
 
+    const key = `profiles:${userId}:${page}:${limit}`
+
+    const cached = await this.cache.get(key)
+    if (cached) return cached
+
     const where: Prisma.ProfileWhereInput = { ownerId: userId }
     if (pagination.search) where.name = { contains: pagination.search, mode: 'insensitive' }
 
@@ -41,6 +51,7 @@ export class ProfilesService {
       select: { id: true, name: true, avatar: true },
     })
 
+    await this.cache.set(key, profiles, TTL)
     return profiles
   }
 

@@ -4,7 +4,7 @@ config:
   target: https://sophisticated-cheese-development.up.railway.app/api
   phases:
     - duration: 10
-      arrivalRate: 12
+      arrivalRate: 2
       name: Main Phase
     # - duration: 20
     # arrivalRate: 5
@@ -40,4 +40,4 @@ scenarios:
               url: '/transactions/list'
               headers:
                 Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwNjc1NDEsImV4cCI6MTcxMzE1Mzk0MX0.xYFnBhro_IBNbewMrulbXtVKF9ECe_7LAifXU5TOmNQ'
-        count: 40
+        count: 100
