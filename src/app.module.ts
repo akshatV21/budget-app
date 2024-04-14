@@ -12,7 +12,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter'
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    EventEmitterModule.forRoot({ global: true }),
+    EventEmitterModule.forRoot({ global: true, maxListeners: 100 }),
     DatabaseModule,
     AuthModule,
     ProfilesModule,
