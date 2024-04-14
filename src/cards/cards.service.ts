@@ -1,14 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Inject, Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/database/database.service'
 import { CreateCardDto } from './dtos/create-card.dto'
 import { AuthUser } from 'src/utils/types'
 import { ListCardsDto } from './dtos/list-cards.dto'
 import { Prisma } from '@prisma/client'
 import { UpdateCardDto } from './dtos/update-card.dto'
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
+import { TTL } from 'src/utils/constants'
 
 @Injectable()
 export class CardsService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
+  ) {}
 
   async create(data: CreateCardDto, user: AuthUser) {
     const duplicateNamePromise = this.db.card.findUnique({
@@ -21,7 +26,10 @@ export class CardsService {
       select: { id: true },
     })
 
-    const [duplicateName, duplicateNumber] = await Promise.all([duplicateNamePromise, duplicateNumberPromise])
+    const [duplicateName, duplicateNumber] = await Promise.all([
+      duplicateNamePromise,
+      duplicateNumberPromise,
+    ])
 
     if (duplicateName) {
       throw new BadRequestException('Card with provided name already exists.')
@@ -42,6 +50,11 @@ export class CardsService {
     const page = query.page ?? 1
     const limit = query.limit ?? 10
 
+    const key = `cards:${query.accountId}:${page}:${limit}`
+
+    const cached = await this.cache.get(key)
+    if (cached) return cached
+
     const where: Prisma.CardWhereInput = { ownerId: user.id }
     if (query.accountId) where.accountId = query.accountId
 
@@ -58,6 +71,7 @@ export class CardsService {
       },
     })
 
+    await this.cache.set(key, cards, TTL)
     return cards
   }
 

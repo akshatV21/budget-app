@@ -1,10 +1,10 @@
 # artillery run ./artillery/get-routes.test.yml
 config:
   # target: http://localhost:8080/api
-  target: https://budget-api-development.up.railway.app/api
+  target: https://sophisticated-cheese-development.up.railway.app/api
   phases:
     - duration: 10
-      arrivalRate: 10
+      arrivalRate: 2
       name: Main Phase
     # - duration: 20
     # arrivalRate: 5
@@ -20,24 +20,24 @@ config:
     apdex: {}
     metrics-by-endpoint: {}
   apdex:
-    threshold: 400
+    threshold: 250
 scenarios:
   - flow:
       - loop:
           - get:
               url: '/accounts/list'
               headers:
-                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwMjQzNzYsImV4cCI6MTcxMzExMDc3Nn0.fkUjb7WbHeEOWrOaN4kyHgjF-0eApx8cKRNdbFIKjsk'
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwNjc1NDEsImV4cCI6MTcxMzE1Mzk0MX0.xYFnBhro_IBNbewMrulbXtVKF9ECe_7LAifXU5TOmNQ'
           - get:
               url: '/cards/list'
               headers:
-                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwMjQzNzYsImV4cCI6MTcxMzExMDc3Nn0.fkUjb7WbHeEOWrOaN4kyHgjF-0eApx8cKRNdbFIKjsk'
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwNjc1NDEsImV4cCI6MTcxMzE1Mzk0MX0.xYFnBhro_IBNbewMrulbXtVKF9ECe_7LAifXU5TOmNQ'
           - get:
               url: '/profiles/list'
               headers:
-                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwMjQzNzYsImV4cCI6MTcxMzExMDc3Nn0.fkUjb7WbHeEOWrOaN4kyHgjF-0eApx8cKRNdbFIKjsk'
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwNjc1NDEsImV4cCI6MTcxMzE1Mzk0MX0.xYFnBhro_IBNbewMrulbXtVKF9ECe_7LAifXU5TOmNQ'
           - get:
               url: '/transactions/list'
               headers:
-                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwMjQzNzYsImV4cCI6MTcxMzExMDc3Nn0.fkUjb7WbHeEOWrOaN4kyHgjF-0eApx8cKRNdbFIKjsk'
-        count: 40
+                Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsdHloZWI1eDAwMDAyaTkxdzJxcjh5MXMiLCJpYXQiOjE3MTMwNjc1NDEsImV4cCI6MTcxMzE1Mzk0MX0.xYFnBhro_IBNbewMrulbXtVKF9ECe_7LAifXU5TOmNQ'
+        count: 100

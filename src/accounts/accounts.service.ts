@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Inject, Injectable } from '@nestjs/common'
 import { DatabaseService } from 'src/database/database.service'
 import { CreateAccountDto } from './dtos/create-account.dto'
 import { AuthUser } from 'src/utils/types'
@@ -7,10 +7,15 @@ import { Prisma } from '@prisma/client'
 import { UpdateAccountDto } from './dtos/update-account.dto'
 import { endOfWeek, startOfWeek } from 'date-fns'
 import { generateDatesByInterval } from 'src/utils/functions'
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager'
+import { TTL } from 'src/utils/constants'
 
 @Injectable()
 export class AccountsService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
+  ) {}
 
   async create(data: CreateAccountDto, user: AuthUser) {
     const duplicateNamePromise = this.db.account.findUnique({
@@ -46,6 +51,11 @@ export class AccountsService {
   async getById(accountId: string, user: AuthUser) {
     const currentDate = new Date()
     const dates = generateDatesByInterval(currentDate, user.interval)
+
+    const key = `account:${accountId}:${dates.from}:${dates.to}`
+
+    const cached = await this.cache.get(key)
+    if (cached) return cached
 
     const accountPromise = this.db.account.findUnique({
       where: { id: accountId },
@@ -83,12 +93,19 @@ export class AccountsService {
     }
 
     const res = { ...account, stats }
+    await this.cache.set(key, res, TTL)
+
     return res
   }
 
   async list(pagination: PaginationDto, user: AuthUser) {
     const page = pagination.page ?? 1
     const limit = pagination.limit ?? 10
+
+    const key = `accounts:${user.id}:${page}:${limit}`
+
+    const cached = await this.cache.get(key)
+    if (cached) return cached
 
     const where: Prisma.AccountWhereInput = { ownerId: user.id }
     if (pagination.search) where.name = { contains: pagination.search, mode: 'insensitive' }
@@ -100,6 +117,7 @@ export class AccountsService {
       select: { id: true, name: true, bank: true, balance: true },
     })
 
+    await this.cache.set(key, accounts, TTL)
     return accounts
   }
 
