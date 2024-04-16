@@ -76,6 +76,7 @@ model Profile {
   owner   User   @relation(fields: [ownerId], references: [id])
 
   transactions Transaction[]
+  stats        ProfileStats[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -199,4 +200,25 @@ model AccountStats {
 
   @@unique([from, to, interval, accountId])
   @@index([from, to, interval, accountId])
+}
+
+model ProfileStats {
+  id String @id @default(cuid())
+
+  from DateTime
+  to   DateTime
+
+  interval Interval
+
+  credited Float @default(0)
+  debited  Float @default(0)
+
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([from, to, interval, profileId])
+  @@index([from, to, interval, profileId])
 }
