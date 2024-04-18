@@ -24,7 +24,10 @@ export class StatsService {
     `)
 
     try {
-      await this.handleAccountStats(data, dates, operation)
+      await Promise.all([
+        this.handleAccountStats(data, dates, operation),
+        this.handleProfileStats(data, dates, operation),
+      ])
     } catch (error) {
       console.log(`
         id: ${data.transactionId}
@@ -114,6 +117,82 @@ export class StatsService {
     id: ${data.transactionId}
     event: 'transaction-created'
     message: 'Handled account stats successfully'
+    `)
+  }
+
+  async handleProfileStats(
+    data: TransactionCreatedDto,
+    dates: IntervalDates,
+    operation: Operation,
+  ) {
+    console.log(`
+    id: ${data.transactionId}
+    event: 'transaction-created'
+    message: 'Handling profile stats'
+    `)
+
+    await this.db.$transaction(async tdb => {
+      const weeklyStatsPromise = tdb.profileStats.upsert({
+        where: {
+          from_to_interval_profileId: {
+            from: dates.weekly.from,
+            to: dates.weekly.to,
+            profileId: data.profileId,
+            interval: 'weekly',
+          },
+        },
+        create: {
+          from: dates.weekly.from,
+          to: dates.weekly.to,
+          profileId: data.profileId,
+          interval: 'weekly',
+        },
+        update: { [operation]: { increment: data.amount } },
+      })
+
+      const monthlyStatsPromise = tdb.profileStats.upsert({
+        where: {
+          from_to_interval_profileId: {
+            from: dates.monthly.from,
+            to: dates.monthly.to,
+            profileId: data.profileId,
+            interval: 'monthly',
+          },
+        },
+        create: {
+          from: dates.monthly.from,
+          to: dates.monthly.to,
+          profileId: data.profileId,
+          interval: 'monthly',
+        },
+        update: { [operation]: { increment: data.amount } },
+      })
+
+      const yearlyStatsPromise = tdb.profileStats.upsert({
+        where: {
+          from_to_interval_profileId: {
+            from: dates.yearly.from,
+            to: dates.yearly.to,
+            profileId: data.profileId,
+            interval: 'yearly',
+          },
+        },
+        create: {
+          from: dates.yearly.from,
+          to: dates.yearly.to,
+          profileId: data.profileId,
+          interval: 'yearly',
+        },
+        update: { [operation]: { increment: data.amount } },
+      })
+
+      await Promise.all([weeklyStatsPromise, monthlyStatsPromise, yearlyStatsPromise])
+    })
+
+    console.log(`
+    id: ${data.transactionId}
+    event: 'transaction-created'
+    message: 'Handled profile stats successfully'
     `)
   }
 }
