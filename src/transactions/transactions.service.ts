@@ -139,6 +139,7 @@ export class TransactionsService {
   async clean() {
     await this.db.loan.deleteMany({})
     await this.db.transaction.deleteMany({})
+    await this.db.profileStats.deleteMany({})
     await this.db.accountStats.deleteMany({})
   }
 
