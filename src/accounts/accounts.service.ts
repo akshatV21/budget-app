@@ -95,6 +95,8 @@ export class AccountsService {
     const res = { ...account, stats }
     await this.cache.set(key, res, TTL)
 
+    console.log('CACHE MISS')
+
     return res
   }
 
@@ -118,6 +120,8 @@ export class AccountsService {
     })
 
     await this.cache.set(key, accounts, TTL)
+    console.log('CACHE MISS')
+
     return accounts
   }
 
