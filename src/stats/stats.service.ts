@@ -70,6 +70,7 @@ export class StatsService {
           to: dates.weekly.to,
           accountId: data.accountId,
           interval: 'weekly',
+          [operation]: data.amount,
         },
         update: { [operation]: { increment: data.amount } },
       })
@@ -88,6 +89,7 @@ export class StatsService {
           to: dates.monthly.to,
           accountId: data.accountId,
           interval: 'monthly',
+          [operation]: data.amount,
         },
         update: { [operation]: { increment: data.amount } },
       })
@@ -106,6 +108,7 @@ export class StatsService {
           to: dates.yearly.to,
           accountId: data.accountId,
           interval: 'yearly',
+          [operation]: data.amount,
         },
         update: { [operation]: { increment: data.amount } },
       })
@@ -146,6 +149,7 @@ export class StatsService {
           to: dates.weekly.to,
           profileId: data.profileId,
           interval: 'weekly',
+          [operation]: data.amount,
         },
         update: { [operation]: { increment: data.amount } },
       })
@@ -164,6 +168,7 @@ export class StatsService {
           to: dates.monthly.to,
           profileId: data.profileId,
           interval: 'monthly',
+          [operation]: data.amount,
         },
         update: { [operation]: { increment: data.amount } },
       })
@@ -175,6 +180,7 @@ export class StatsService {
             to: dates.yearly.to,
             profileId: data.profileId,
             interval: 'yearly',
+            [operation]: data.amount,
           },
         },
         create: {
