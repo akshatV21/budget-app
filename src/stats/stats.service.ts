@@ -180,7 +180,6 @@ export class StatsService {
             to: dates.yearly.to,
             profileId: data.profileId,
             interval: 'yearly',
-            [operation]: data.amount,
           },
         },
         create: {
@@ -188,6 +187,7 @@ export class StatsService {
           to: dates.yearly.to,
           profileId: data.profileId,
           interval: 'yearly',
+          [operation]: data.amount,
         },
         update: { [operation]: { increment: data.amount } },
       })
