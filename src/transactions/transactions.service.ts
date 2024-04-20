@@ -115,6 +115,7 @@ export class TransactionsService {
     if (query.loanId) where.loanId = query.loanId
     if (query.profileId) where.profileId = query.profileId
     if (query.accountId) where.accountId = query.accountId
+    if (query.from && query.to) where.createdAt = { gte: query.from, lte: query.to }
 
     const transactions = await this.db.transaction.findMany({
       where,
@@ -139,6 +140,7 @@ export class TransactionsService {
   async clean() {
     await this.db.loan.deleteMany({})
     await this.db.transaction.deleteMany({})
+    await this.db.profileStats.deleteMany({})
     await this.db.accountStats.deleteMany({})
   }
 

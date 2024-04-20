@@ -21,6 +21,8 @@ export type Order = 'asc' | 'desc'
 
 export type Operation = 'debited' | 'credited'
 
+export type Entity = 'account' | 'profile'
+
 export type TransactionCreatedDto = {
   transactionId: string
   type: TransactionType
