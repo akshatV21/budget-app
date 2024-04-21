@@ -10,6 +10,7 @@ import { StatsModule } from './stats/stats.module'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { CacheModule, CacheStore } from '@nestjs/cache-manager'
 import { redisStore } from 'cache-manager-redis-store'
+import { LoansModule } from './loans/loans.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { redisStore } from 'cache-manager-redis-store'
     CardsModule,
     TransactionsModule,
     StatsModule,
+    LoansModule,
   ],
   controllers: [],
   providers: [],
